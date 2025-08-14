@@ -17,7 +17,10 @@ redp=pygame.image.load("spaceshipRed.png")
 yellowp=pygame.image.load("spaceshipYellow.png")
 redr=pygame.transform.rotate(pygame.transform.scale(redp,(sw,sh)),90)
 yellowr=pygame.transform.rotate(pygame.transform.scale(yellowp,(sw,sh)),270)
+yellowhit=pygame.USEREVENT+1
+redhit=pygame.USEREVENT+2
 
+print(yellowhit)
 pygame.display.update()
 def draw(yellowhealth,redhealth,red,yellow,redbullets,yellowbullets):
     screen.blit(space1,(0,0))
@@ -56,15 +59,17 @@ def movebullets(red,redbullets,yellow,yellowbullets):
     for bullet in redbullets:
         bullet.x+=bulletvel
         if yellow.colliderect(bullet):
-            yellowbullets.remove(bullet)
+            pygame.event.post(pygame.event.Event(yellowhit))
+            redbullets.remove(bullet)
         elif bullet.x>WIDTH:
-            yellowbullets.remove(bullet)
+            redbullets.remove(bullet)
     for bullet in yellowbullets:
         bullet.x-=bulletvel
         if red.colliderect(bullet):
-            redbullets.remove(bullet)
+            pygame.event.post(pygame.event.Event(redhit))
+            yellowbullets.remove(bullet)
         elif bullet.x<0:
-            redbullets.remove(bullet)
+            yellowbullets.remove(bullet)
 def main():
     redhealth=10
     yellowhealth=10
@@ -91,5 +96,22 @@ def main():
                 if event.key==pygame.K_RSHIFT and len(yellowbullets)<maxbullet:
                     bullet=pygame.Rect(yellow.x,yellow.y+yellow.height/2,10,5)
                     yellowbullets.append(bullet)
+            if event.type==redhit:
+                redhealth-=1
+            if event.type==yellowhit:
+                yellowhealth-=1
+        winnertext=""
+        if redhealth<=0:
+            winnertext="yellow wins"
+        if yellowhealth<=0:
+            winnertext="red wins"
+        if winnertext!="":
+            drawwinnertext(winnertext)
+            break
+def drawwinnertext(txt):
+    text=winnerfont.render(txt,1,"white")
+    screen.blit(text,(WIDTH/2-text.get_width()/2,HEIGHT/2-text.get_height()/2))
+    pygame.display.update()
+    pygame.time.delay(5000)
 if __name__=="__main__":
     main()
