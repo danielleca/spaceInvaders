@@ -52,19 +52,19 @@ def yellowmovement(keys_pressed,yellow):
         yellow.x-=vel
     if keys_pressed[pygame.K_d] and yellow.x+yellow.width<WIDTH:
         yellow.x+=vel
-def movebullets(redbullets,yellow,yellowbullets):
+def movebullets(red,redbullets,yellow,yellowbullets):
     for bullet in redbullets:
         bullet.x+=bulletvel
         if yellow.colliderect(bullet):
-            yellowbullets.remove(yellow)
+            yellowbullets.remove(bullet)
         elif bullet.x>WIDTH:
-            yellowbullets.remove(yellow)
+            yellowbullets.remove(bullet)
     for bullet in yellowbullets:
-        bullet.x+=bulletvel
+        bullet.x-=bulletvel
         if red.colliderect(bullet):
-            redbullets.remove(red)
-        elif bullet.x<WIDTH:
-            redbullets.remove(red)
+            redbullets.remove(bullet)
+        elif bullet.x<0:
+            redbullets.remove(bullet)
 def main():
     redhealth=10
     yellowhealth=10
@@ -76,7 +76,7 @@ def main():
         keys_pressed=pygame.key.get_pressed()
         redmovement(keys_pressed,red)
         yellowmovement(keys_pressed,yellow)
-        movebullets(redbullets,yellow,yellowbullets)
+        movebullets(red,redbullets,yellow,yellowbullets)
         draw(yellowhealth,redhealth,red,yellow,redbullets,yellowbullets)
         pygame.display.update()
         for event in pygame.event.get():
@@ -84,8 +84,10 @@ def main():
                 sys.exit()
             if event.type==pygame.KEYDOWN:
                 if event.key==pygame.K_LSHIFT and len(redbullets)<maxbullet:
-                    bullet=pygame.Rect(red.x+red.width,red.y+red.height/2,10,5)
+                    print(redbullets)
+                    bullet=pygame.Rect(red.x+red.width,red.y+red.height/2,10,5)                   
                     redbullets.append(bullet)
+                    
                 if event.key==pygame.K_RSHIFT and len(yellowbullets)<maxbullet:
                     bullet=pygame.Rect(yellow.x,yellow.y+yellow.height/2,10,5)
                     yellowbullets.append(bullet)
